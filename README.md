@@ -2,6 +2,7 @@
 
 *How to play:*
 - Use left & right arrow keys to move
-- Space to shoot/restart
+- Space to shoot
+- Enter to restart
 
 Still developing, needs more levels/difficulties
