@@ -20,6 +20,7 @@ class Game:
         self.obstacles = self.create_obstacles()
         self.aliens_group = pygame.sprite.Group()
         self.create_aliens()
+        self.alien_count = 55
         self.aliens_direction = 1
         self.alien_lasers_group = pygame.sprite.Group()
         self.mystery_ship_group = pygame.sprite.GroupSingle()
@@ -57,6 +58,7 @@ class Game:
                     type = 1
                 alien = Alien(type, alien_type, x,y)
                 self.aliens_group.add(alien)
+
     def move_aliens(self):
         self.aliens_group.update(self.aliens_direction)
 
@@ -80,6 +82,10 @@ class Game:
             laser_sprite = Laser(random_aliens.rect.center, -6, self.screen_height)
             self.alien_lasers_group.add(laser_sprite)
 
+    def check_aliens(self):
+        if self.alien_count == 0:
+            self.run = False
+
     def create_mystery_ship(self):
         self.mystery_ship_group.add(MysteryShip(self.screen_width))
 
@@ -92,6 +98,7 @@ class Game:
                     for alien in aliens_hit:
                         self.score += alien.type*100
                         self.check_for_highscore()
+                        self.alien_count -= 1
                     laser_sprite.kill()
                 if pygame.sprite.spritecollide(laser_sprite, self.mystery_ship_group, True):
                     self.score += 500
@@ -133,6 +140,7 @@ class Game:
         self.mystery_ship_group.empty()
         self.obstacles = self.create_obstacles()
         self.score = 0
+        self.alien_count = 55
 
     def check_for_highscore(self):
         if self.score > self.highscore:
