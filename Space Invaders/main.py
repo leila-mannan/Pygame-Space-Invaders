@@ -1,3 +1,5 @@
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame, sys, random
 from game import Game
 
@@ -15,7 +17,9 @@ level_surface = font.render("LEVEL 01", False, Yellow)
 game_over_surface = font.render("GAME OVER", False, Yellow)
 score_text_surface = font.render("SCORE", False, Yellow)
 highscore_text_surface = font.render("HIGH-SCORE", False, Yellow)
-restart_surface = font.render("[SPACE] TO RESTART", False, Yellow)
+restart_surface = font.render("[ENTER] TO RESTART", False, Yellow)
+play_again_surface = font.render("WINNER! PLAY AGAIN?", False, Yellow)
+try_again_surface = font.render("TRY AGAIN!", False, Yellow)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH + OFFSET, SCREEN_HEIGHT + 2*OFFSET))
 pygame.display.set_caption('Space Invaders')
@@ -43,7 +47,7 @@ while True:
             pygame.time.set_timer(MYSTERYSHIP, random.randint(4000, 8000))
 
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and game.run == False:
+        if keys[pygame.K_RETURN] and game.run == False:
             game.reset()
 
     #Updating
@@ -53,6 +57,7 @@ while True:
         game.alien_lasers_group.update()
         game.mystery_ship_group.update()
         game.check_for_collisions()
+        game.check_aliens()
 
     # Drawing
     screen.fill(Grey)
@@ -64,7 +69,11 @@ while True:
         screen.blit(level_surface, (590, 725, 50, 50))
     else:
         screen.blit(game_over_surface, (540, 725, 50, 50))
-        screen.blit(restart_surface, (230, 400, 50, 50))
+        screen.blit(restart_surface, (230, 420, 50, 50))
+        if game.alien_count == 0:
+            screen.blit(play_again_surface, (230, 370, 50, 50))
+        else:
+            screen.blit(try_again_surface, (315, 370, 50, 50))
 
     x = 50
     for life in range(game.lives):
