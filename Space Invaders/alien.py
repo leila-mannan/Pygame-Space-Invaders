@@ -5,11 +5,12 @@ class Alien(pygame.sprite.Sprite):
         super().__init__()
         self.type = type
         self.image = image
-        self. rect = pygame.Rect(self.image.get_rect(topleft = (x, y)))
+        self.rect = pygame.Rect(self.image.get_rect(topleft = (x, y)))
 
     def update(self,direction):
         self.rect.x += direction
 class MysteryShip(pygame.sprite.Sprite):
+    s = 3
     def __init__(self, screen_width):
         super().__init__()
         self.screen_width = screen_width
@@ -17,9 +18,9 @@ class MysteryShip(pygame.sprite.Sprite):
 
         x = random.choice([0,screen_width - self.image.get_width()])
         if x == 0:
-            self.speed = 3
+            self.speed = self.s
         else:
-            self.speed = -3
+            self.speed = -self.s
 
         self.rect = self.image.get_rect(topleft = (x, 85))
 
