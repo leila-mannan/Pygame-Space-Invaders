@@ -1,6 +1,5 @@
 import pygame
 
-
 class Laser(pygame.sprite.Sprite):
     def __init__(self, position, speed, screen_height):
         super().__init__()
