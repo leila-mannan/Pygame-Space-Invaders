@@ -2,7 +2,6 @@ from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame, sys, random
 from game import Game
-
 pygame.init()
 
 SCREEN_WIDTH = 750
@@ -20,7 +19,7 @@ level_surface = font.render(level_text, False, Yellow)
 game_over_surface = font.render("GAME OVER", False, Yellow)
 score_text_surface = font.render("SCORE", False, Yellow)
 highscore_text_surface = font.render("HIGH-SCORE", False, Yellow)
-restart_surface = font.render("[ENTER] TO RESTART", False, Yellow)
+restart_surface = font.render("[ENTER] TO START", False, Yellow)
 play_again_surface = font.render("WINNER! NEXT LEVEL?", False, Yellow)
 try_again_surface = font.render("TRY AGAIN!", False, Yellow)
 instructions_surface = smaller_font.render("[SPACE] TO SHOOT", False, Yellow)
@@ -31,9 +30,9 @@ pygame.display.set_caption('Space Invaders')
 clock = pygame.time.Clock()
 
 game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, OFFSET)
-
+laser_delay = 700
 SHOOT_LASER = pygame.USEREVENT
-pygame.time.set_timer(SHOOT_LASER, 300)
+pygame.time.set_timer(SHOOT_LASER, laser_delay)
 
 MYSTERYSHIP = pygame.USEREVENT+1
 pygame.time.set_timer(MYSTERYSHIP, random.randint(4000, 8000))
@@ -54,11 +53,11 @@ while True:
         if keys[pygame.K_RETURN] and game.run == False:
             if game.alien_count == 0:  # if the game is won
                 game.next_level()
+                new_delay = laser_delay-50
+                laser_delay = new_delay if laser_delay>100 else 100
+                pygame.time.set_timer(SHOOT_LASER, laser_delay)
                 level+=1
-                if level>9:
-                    level_text = "LEVEL " + str(level)
-                else:
-                    level_text = "LEVEL 0" + str(level)
+                level_text = "LEVEL " + str(level) if level>9 else "LEVEL 0" + str(level)
             else:
                 game.reset()
                 level = 1
@@ -90,11 +89,8 @@ while True:
     #once the game ends, display:
     else:
         screen.blit(game_over_surface, (540, 725, 50, 50))
-        screen.blit(restart_surface, (230, 420, 50, 50))
-        if game.alien_count == 0: #if the game is won
-            screen.blit(play_again_surface, (230, 370, 50, 50))
-        else:
-            screen.blit(try_again_surface, (315, 370, 50, 50))
+        screen.blit(restart_surface, (250, 420, 50, 50))
+        screen.blit(play_again_surface, (230, 370, 50, 50)) if game.alien_count == 0 else screen.blit(try_again_surface, (315, 370, 50, 50))
 
     x = 50
     for life in range(game.lives):
