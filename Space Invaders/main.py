@@ -13,6 +13,7 @@ Grey = (29, 29, 27)
 Yellow = (243, 216, 63)
 
 font = pygame.font.Font("Gameplay.ttf", 30)
+smaller_font = pygame.font.Font("Gameplay.ttf", 20)
 level_surface = font.render("LEVEL 01", False, Yellow)
 game_over_surface = font.render("GAME OVER", False, Yellow)
 score_text_surface = font.render("SCORE", False, Yellow)
@@ -20,6 +21,7 @@ highscore_text_surface = font.render("HIGH-SCORE", False, Yellow)
 restart_surface = font.render("[ENTER] TO RESTART", False, Yellow)
 play_again_surface = font.render("WINNER! PLAY AGAIN?", False, Yellow)
 try_again_surface = font.render("TRY AGAIN!", False, Yellow)
+instructions_surface = smaller_font.render("[SPACE] TO SHOOT", False, Yellow)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH + OFFSET, SCREEN_HEIGHT + 2*OFFSET))
 pygame.display.set_caption('Space Invaders')
@@ -48,6 +50,7 @@ while True:
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RETURN] and game.run == False:
+            instructions_surface = smaller_font.render("[SPACE] TO SHOOT", False, Yellow)
             game.reset()
 
     #Updating
@@ -67,6 +70,10 @@ while True:
     pygame.draw.line(screen, Yellow, (25, 700), (775, 700), 3)
     if game.run:
         screen.blit(level_surface, (590, 725, 50, 50))
+        screen.blit(instructions_surface, (300, 725, 50, 50))
+        if keys[pygame.K_SPACE]:
+            instructions_surface = smaller_font.render("", False, Yellow)
+
     else:
         screen.blit(game_over_surface, (540, 725, 50, 50))
         screen.blit(restart_surface, (230, 420, 50, 50))
