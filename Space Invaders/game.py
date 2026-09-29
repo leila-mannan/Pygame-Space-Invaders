@@ -29,19 +29,22 @@ class Game:
         self.score = 0
         self.highscore = 0
         self.load_highscore()
+        self.level = 1
+        self.alien_speed = 1
+        self.laser_speed = -3
 
     def create_obstacles(self):
         obstacle_width = len(grid[0])*3
         gap = (self.screen_width - (4*obstacle_width))/5
         obstacles = []
-        for i in range(4):
+        for i in range(4): #makes 3 obstacles
             offset_x = (i+1) * gap+i*obstacle_width
             obstacle = Obstacle(offset_x, self.screen_height - 150)
             obstacles.append(obstacle)
         return obstacles
 
     def create_aliens(self):
-        for row in range(5):
+        for row in range(5): #generates 55 aliens
             for column in range(11):
                 x = 75+column*55
                 y = 110+row*55
@@ -65,25 +68,25 @@ class Game:
         alien_sprites = self.aliens_group.sprites()
         for alien in alien_sprites:
             if alien.rect.right >= self.screen_width:
-                self.aliens_direction = -1
+                self.aliens_direction = -self.alien_speed
                 self.alien_move_down(2)
             elif alien.rect.left <= 0:
-                self.aliens_direction = 1
+                self.aliens_direction = self.alien_speed
                 self.alien_move_down(2)
 
     def alien_move_down(self, distance):
         if self.aliens_group:
             for alien in self.aliens_group:
-                alien.rect.y += distance
+                alien.rect.y += distance #aliens gradually move down
 
     def alien_shoot_laser(self):
-        if self.aliens_group.sprites():
+        if self.aliens_group.sprites(): #lasers shoot randomly until there's one alien left
             random_aliens = random.choice(self.aliens_group.sprites())
-            laser_sprite = Laser(random_aliens.rect.center, -6, self.screen_height)
+            laser_sprite = Laser(random_aliens.rect.center, self.laser_speed, self.screen_height)
             self.alien_lasers_group.add(laser_sprite)
 
     def check_aliens(self):
-        if self.alien_count == 0:
+        if self.alien_count == 0: #if all aliens are eliminated, game ends
             self.run = False
 
     def create_mystery_ship(self):
@@ -96,7 +99,7 @@ class Game:
                 aliens_hit = pygame.sprite.spritecollide(laser_sprite, self.aliens_group, True)
                 if aliens_hit:
                     for alien in aliens_hit:
-                        self.score += alien.type*100
+                        self.score += alien.type*10
                         self.check_for_highscore()
                         self.alien_count -= 1
                     laser_sprite.kill()
@@ -108,7 +111,7 @@ class Game:
                 for obstacle in self.obstacles:
                     if pygame.sprite.spritecollide(laser_sprite, obstacle.blocks_group, True):
                         laser_sprite.kill()
-        #alien lasers
+        #alien laser damage
         if self.alien_lasers_group:
             for laser_sprite in self.alien_lasers_group:
                 if pygame.sprite.spritecollide(laser_sprite, self.spaceship_group, False):
@@ -122,10 +125,26 @@ class Game:
                         laser_sprite.kill()
         if self.aliens_group:
             for alien in self.aliens_group:
-                for obstacle in self.obstacles:
+                for obstacle in self.obstacles: #if aliens touch the obstacles, game ends
                     pygame.sprite.spritecollide(alien, obstacle.blocks_group, True)
                 if pygame.sprite.spritecollide(alien, self.spaceship_group, False):
                     self.game_over()
+
+    def next_level(self): #TODO update this
+        #reset
+        self.run = True
+        self.lives = 3
+        self.spaceship_group.sprite.reset()
+        self.aliens_group.empty()
+        self.alien_lasers_group.empty()
+        self.create_aliens()
+        self.mystery_ship_group.empty()
+        self.obstacles = self.create_obstacles()
+        self.alien_count = 55
+        self.level += 1 #increase level
+        MysteryShip.s += 0.2 #speed increases - more difficult to hit
+        self.alien_speed += 0.3
+        self.laser_speed -= 0.5
 
     def game_over(self):
         self.run = False
@@ -141,11 +160,13 @@ class Game:
         self.obstacles = self.create_obstacles()
         self.score = 0
         self.alien_count = 55
+        self.alien_speed = 1
+        self.level = 1
 
     def check_for_highscore(self):
         if self.score > self.highscore:
             self.highscore = self.score
-
+            #saves new highscore
             with open("highscore.txt", "w") as file:
                 file.write(str(self.highscore))
 
