@@ -32,6 +32,7 @@ class Game:
         self.level = 1
         self.alien_speed = 1
         self.laser_speed = -3
+        #self.laser_freq =  1
 
     def create_obstacles(self):
         obstacle_width = len(grid[0])*3
@@ -48,7 +49,6 @@ class Game:
             for column in range(11):
                 x = 75+column*55
                 y = 110+row*55
-
                 if row == 0:
                     alien_type = image3
                     type = 3
@@ -80,7 +80,7 @@ class Game:
                 alien.rect.y += distance #aliens gradually move down
 
     def alien_shoot_laser(self):
-        if self.aliens_group.sprites(): #lasers shoot randomly until there's one alien left
+        if self.aliens_group.sprites(): #lasers shoot randomly until one alien is left
             random_aliens = random.choice(self.aliens_group.sprites())
             laser_sprite = Laser(random_aliens.rect.center, self.laser_speed, self.screen_height)
             self.alien_lasers_group.add(laser_sprite)
@@ -130,10 +130,9 @@ class Game:
                 if pygame.sprite.spritecollide(alien, self.spaceship_group, False):
                     self.game_over()
 
-    def next_level(self): #TODO update this
+    def next_level(self):
         #reset
         self.run = True
-        self.lives = 3
         self.spaceship_group.sprite.reset()
         self.aliens_group.empty()
         self.alien_lasers_group.empty()
