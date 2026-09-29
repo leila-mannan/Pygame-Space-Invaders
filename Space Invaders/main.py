@@ -11,15 +11,17 @@ OFFSET = 50
 
 Grey = (29, 29, 27)
 Yellow = (243, 216, 63)
-
+level = 1
+#text surfaces
 font = pygame.font.Font("Gameplay.ttf", 30)
 smaller_font = pygame.font.Font("Gameplay.ttf", 20)
-level_surface = font.render("LEVEL 01", False, Yellow)
+level_text = "LEVEL 0" + str(level)
+level_surface = font.render(level_text, False, Yellow)
 game_over_surface = font.render("GAME OVER", False, Yellow)
 score_text_surface = font.render("SCORE", False, Yellow)
 highscore_text_surface = font.render("HIGH-SCORE", False, Yellow)
 restart_surface = font.render("[ENTER] TO RESTART", False, Yellow)
-play_again_surface = font.render("WINNER! PLAY AGAIN?", False, Yellow)
+play_again_surface = font.render("WINNER! NEXT LEVEL?", False, Yellow)
 try_again_surface = font.render("TRY AGAIN!", False, Yellow)
 instructions_surface = smaller_font.render("[SPACE] TO SHOOT", False, Yellow)
 
@@ -50,8 +52,19 @@ while True:
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RETURN] and game.run == False:
-            instructions_surface = smaller_font.render("[SPACE] TO SHOOT", False, Yellow)
-            game.reset()
+            if game.alien_count == 0:  # if the game is won
+                game.next_level()
+                level+=1
+                if level>9:
+                    level_text = "LEVEL " + str(level)
+                else:
+                    level_text = "LEVEL 0" + str(level)
+            else:
+                game.reset()
+                level = 1
+                level_text = "LEVEL 01"
+                instructions_surface = smaller_font.render("[SPACE] TO SHOOT", False, Yellow)
+            level_surface = font.render(level_text, False, Yellow)
 
     #Updating
     if game.run:
@@ -68,16 +81,17 @@ while True:
     #UI
     pygame.draw.rect(screen, Yellow, (10, 10, 780, 780), 2, 0, 60, 60, 60, 60)
     pygame.draw.line(screen, Yellow, (25, 700), (775, 700), 3)
+    #while the game is running, display:
     if game.run:
         screen.blit(level_surface, (590, 725, 50, 50))
         screen.blit(instructions_surface, (300, 725, 50, 50))
         if keys[pygame.K_SPACE]:
             instructions_surface = smaller_font.render("", False, Yellow)
-
+    #once the game ends, display:
     else:
         screen.blit(game_over_surface, (540, 725, 50, 50))
         screen.blit(restart_surface, (230, 420, 50, 50))
-        if game.alien_count == 0:
+        if game.alien_count == 0: #if the game is won
             screen.blit(play_again_surface, (230, 370, 50, 50))
         else:
             screen.blit(try_again_surface, (315, 370, 50, 50))
@@ -86,7 +100,7 @@ while True:
     for life in range(game.lives):
         screen.blit(game.spaceship_group.sprite.image, (x, 700))
         x += 50
-
+    #constantly display the score & highscore
     screen.blit(score_text_surface, (50,25,50,50))
     formatted_score = str(game.score).zfill(5)
     score_surface = font.render(formatted_score, False, Yellow)
